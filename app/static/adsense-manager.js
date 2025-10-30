@@ -30,6 +30,24 @@ class AdSenseManager {
                     this.showAllFallbackAds();
                 }, 2000);
             }
+            
+            // Additional check for production environments (Railway, etc.)
+            const isProduction = window.location.hostname.includes('railway.app') || 
+                               window.location.hostname.includes('herokuapp.com') ||
+                               !window.location.hostname.includes('localhost');
+            
+            if (isProduction) {
+                console.log('Production environment detected - enabling aggressive fallback checks');
+                setTimeout(() => {
+                    console.log('Production fallback check at 3s');
+                    this.checkAndShowFallbacks();
+                }, 3000);
+                
+                setTimeout(() => {
+                    console.log('Production fallback check at 5s');
+                    this.checkAndShowFallbacks();
+                }, 5000);
+            }
         }
         
         if (this.cookieConsentGiven || !this.config.cookieConsentEnabled) {
@@ -196,23 +214,32 @@ class AdSenseManager {
             }
         });
         
-        // Check for AdSense availability after page load
+        // Multiple aggressive checks for production
         setTimeout(() => {
             if (!window.adsbygoogle) {
-                console.log('AdSense not available after timeout, showing fallbacks');
+                console.log('AdSense not available after 1s timeout, showing fallbacks');
                 this.showAllFallbackAds();
             } else {
-                // Even if AdSense is available, check if ads actually loaded
                 console.log('AdSense available, checking if ads loaded...');
-                setTimeout(() => this.checkAndShowFallbacks(), 1000);
+                this.checkAndShowFallbacks();
             }
         }, 1000);
         
-        // Additional aggressive fallback check
+        // Additional checks at different intervals
         setTimeout(() => {
-            console.log('Aggressive fallback check - ensuring ads are visible');
+            console.log('2s fallback check - ensuring ads are visible');
             this.checkAndShowFallbacks();
-        }, 3000);
+        }, 2000);
+        
+        setTimeout(() => {
+            console.log('4s aggressive fallback check');
+            this.checkAndShowFallbacks();
+        }, 4000);
+        
+        setTimeout(() => {
+            console.log('6s final fallback check');
+            this.checkAndShowFallbacks();
+        }, 6000);
     }
 
     scheduleAdCheck(adElement, slotNumber) {
@@ -234,20 +261,25 @@ class AdSenseManager {
         const hasContent = adElement.innerHTML.trim() !== '';
         const hasIframe = adElement.querySelector('iframe') !== null;
         const hasGoogleAd = adElement.querySelector('[id*="google_ads"]') !== null;
+        const hasInsContent = adElement.querySelector('ins[data-ad-status]') !== null;
         const isMarkedFilled = adElement.dataset.adsbygoogleStatus === 'done';
         const isFallbackAd = adElement.dataset.fallbackAd === 'true';
+        const isProcessed = adElement.dataset.adsenseProcessed === 'true';
         
         // If it's already a fallback ad, consider it "loaded"
         if (isFallbackAd) {
             return true;
         }
         
-        // For real AdSense ads, check if they have actual ad content
-        const hasRealAdContent = hasIframe || hasGoogleAd || (hasContent && !isFallbackAd);
+        // Check for various signs of AdSense content
+        const hasRealAdContent = hasIframe || hasGoogleAd || hasInsContent || isMarkedFilled;
         
-        console.log(`Ad check - hasContent: ${hasContent}, hasIframe: ${hasIframe}, hasGoogleAd: ${hasGoogleAd}, isFallback: ${isFallbackAd}, realContent: ${hasRealAdContent}`);
+        // More aggressive detection - if processed but no content after reasonable time, it's empty
+        const isEmpty = isProcessed && !hasContent && !hasRealAdContent;
         
-        return hasRealAdContent;
+        console.log(`Ad check - processed: ${isProcessed}, hasContent: ${hasContent}, hasIframe: ${hasIframe}, hasGoogleAd: ${hasGoogleAd}, isEmpty: ${isEmpty}, realContent: ${hasRealAdContent}`);
+        
+        return hasRealAdContent && !isEmpty;
     }
 
     checkAndShowFallbacks() {
