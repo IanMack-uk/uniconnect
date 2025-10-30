@@ -68,23 +68,12 @@ def health_check():
 
 @app.get("/adsense-status")
 def adsense_status():
-    """Development endpoint to check AdSense configuration"""
+    """Lightweight status endpoint"""
+    from datetime import datetime
     return {
-        "publisher_id": settings.adsense_publisher_id,
-        "home_slot_id": settings.adsense_home_slot_id,
-        "mentors_slot_id": settings.adsense_mentors_slot_id,
-        "test_mode": settings.adsense_test_mode,
-        "environment": settings.environment,
-        "cookie_consent_enabled": settings.cookie_consent_enabled,
-        "show_fallback_ads": settings.show_fallback_ads,
-        "production_ready": settings.is_production_ready(),
-        "status": "production" if settings.is_production_ready() else "development",
-        "next_steps": [] if settings.is_production_ready() else [
-            "Set ENVIRONMENT=production",
-            "Set ADSENSE_TEST_MODE=false", 
-            "Replace placeholder slot IDs with real Google AdSense slot IDs",
-            "Deploy to a real domain (not localhost)"
-        ]
+        "publisher": "ca-pub-9219208012298253",
+        "npa_default": True,
+        "time": datetime.utcnow().isoformat() + "Z"
     }
 
 @app.get("/test-ads")
@@ -99,5 +88,7 @@ def test_ads(request: Request):
             "adsense_test_mode": settings.adsense_test_mode,
             "cookie_consent_enabled": settings.cookie_consent_enabled,
             "environment": settings.environment,
+            "show_fallback_ads": settings.show_fallback_ads,
+            "production_ready": settings.is_production_ready(),
         },
     )

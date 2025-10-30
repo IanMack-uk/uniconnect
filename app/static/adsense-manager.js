@@ -5,6 +5,10 @@ class AdSenseManager {
         this.cookieConsentGiven = this.getCookieConsent();
         this.init();
     }
+    
+    getCookieConsent() {
+        return localStorage.getItem('uni_cookie_ads') === 'accept';
+    }
 
     init() {
         console.log('AdSenseManager initializing...');
@@ -13,12 +17,19 @@ class AdSenseManager {
             this.setupCookieConsent();
         }
         
-        // Only show fallback ads if explicitly enabled
-        if (this.config.showFallbackAds && this.config.environment === 'development') {
-            console.log('Development mode: showing fallback ads immediately');
-            setTimeout(() => {
-                this.showAllFallbackAds();
-            }, 1000);
+        // Show fallback ads if enabled (works in all environments now)
+        if (this.config.showFallbackAds) {
+            console.log('Fallback ads enabled - will show if AdSense fails');
+            this.setupFallbackDetection();
+            
+            // Force show fallbacks after a short delay if we're not in production
+            if (!this.config.productionReady) {
+                console.log('Not production ready - will force show fallbacks');
+                setTimeout(() => {
+                    console.log('Forcing fallback ads due to non-production environment');
+                    this.showAllFallbackAds();
+                }, 2000);
+            }
         }
         
         if (this.cookieConsentGiven || !this.config.cookieConsentEnabled) {
@@ -27,25 +38,26 @@ class AdSenseManager {
     }
 
     setupCookieConsent() {
-        const banner = document.getElementById('cookie-banner');
-        const acceptBtn = document.getElementById('cookie-accept');
-        const rejectBtn = document.getElementById('cookie-reject');
-
-        if (!this.cookieConsentGiven && banner) {
-            banner.style.display = 'block';
-        }
-
-        if (acceptBtn) {
-            acceptBtn.addEventListener('click', () => {
-                this.acceptCookies();
-            });
-        }
-
-        if (rejectBtn) {
-            rejectBtn.addEventListener('click', () => {
-                this.rejectCookies();
-            });
-        }
+        // The new cookie banner is handled inline in base.html
+        // This method is kept for compatibility but the banner logic is now in the template
+        console.log('Cookie consent setup - handled by inline script in base.html');
+        
+        // Listen for consent changes to update ad behavior
+        this.monitorConsentChanges();
+    }
+    
+    monitorConsentChanges() {
+        // Check for consent changes periodically
+        setInterval(() => {
+            const currentConsent = this.getCookieConsent();
+            if (currentConsent !== this.cookieConsentGiven) {
+                this.cookieConsentGiven = currentConsent;
+                console.log('Consent changed to:', currentConsent);
+                if (currentConsent) {
+                    this.enableAds();
+                }
+            }
+        }, 1000);
     }
 
     acceptCookies() {
@@ -65,63 +77,192 @@ class AdSenseManager {
 
     enableAds() {
         // Enable AdSense ads
+        console.log('enableAds() called, showFallbackAds:', this.config.showFallbackAds);
+        
         if (window.adsbygoogle) {
             const ads = document.querySelectorAll('.adsbygoogle');
             console.log('Found', ads.length, 'ad slots');
             
+            if (ads.length === 0) {
+                console.log('No ad slots found! Make sure .adsbygoogle elements exist in DOM');
+                return;
+            }
+            
             ads.forEach((ad, index) => {
+                console.log(`Processing ad slot ${index + 1}:`, ad);
                 if (!ad.dataset.adsbygoogleStatus) {
                     try {
                         console.log('Loading ad slot', index + 1, 'with client:', ad.dataset.adClient);
                         (adsbygoogle = window.adsbygoogle || []).push({});
                         
-                        // Add fallback for localhost/development
-                        if (this.config.environment === 'development') {
-                            setTimeout(() => {
-                                if (!ad.innerHTML.trim() || ad.innerHTML === '') {
-                                    this.showFallbackAd(ad, index + 1);
-                                }
-                            }, 3000);
+                        // Add fallback detection for all environments if enabled
+                        if (this.config.showFallbackAds) {
+                            console.log(`Scheduling fallback check for ad slot ${index + 1}`);
+                            this.scheduleAdCheck(ad, index + 1);
                         }
                     } catch (e) {
                         console.log('AdSense error:', e);
-                        if (this.config.environment === 'development') {
+                        if (this.config.showFallbackAds) {
+                            console.log(`Showing immediate fallback for ad slot ${index + 1} due to error`);
                             this.showFallbackAd(ad, index + 1);
                         }
                     }
+                } else {
+                    console.log(`Ad slot ${index + 1} already processed`);
                 }
             });
         } else {
             console.log('AdSense script not loaded');
-            if (this.config.environment === 'development') {
+            if (this.config.showFallbackAds) {
+                console.log('Showing fallback ads because AdSense script failed to load');
                 this.showAllFallbackAds();
             }
         }
     }
 
+    getFallbackAdDesigns() {
+        return [
+            {
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                title: '🎓 Support Music Education',
+                subtitle: 'Help fund UNI Music Scholarships',
+                note: 'Your visit makes a difference!'
+            },
+            {
+                background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                title: '🎵 Connect with Alumni',
+                subtitle: 'Join our music mentorship network',
+                note: 'Real ads support our mission'
+            },
+            {
+                background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                title: '🎶 Music Opportunities',
+                subtitle: 'Discover careers in music industry',
+                note: 'Powered by community support'
+            },
+            {
+                background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                title: '🎤 Alumni Network',
+                subtitle: 'Connect, learn, and grow together',
+                note: 'Supporting the next generation'
+            }
+        ];
+    }
+
     showFallbackAd(adElement, slotNumber) {
+        const designs = this.getFallbackAdDesigns();
+        const design = designs[(slotNumber - 1) % designs.length];
+        
         adElement.innerHTML = `
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            <div class="uni-fallback-ad" style="background: ${design.background}; 
                         color: white; 
                         padding: 20px; 
                         text-align: center; 
-                        border-radius: 8px;
+                        border-radius: 12px;
                         min-height: 200px;
                         display: flex;
                         flex-direction: column;
-                        justify-content: center;">
-                <h3 style="margin: 0 0 10px 0; font-size: 18px;">🎓 Development Ad Slot ${slotNumber}</h3>
-                <p style="margin: 0 0 10px 0; opacity: 0.9;">Supporting UNI Music Scholarships</p>
-                <small style="opacity: 0.7;">Real ads will appear in production</small>
+                        justify-content: center;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                        cursor: pointer;
+                        transition: transform 0.2s ease;"
+                 onmouseover="this.style.transform='scale(1.02)'"
+                 onmouseout="this.style.transform='scale(1)'"
+                 onclick="console.log('Fallback ad clicked - slot ${slotNumber}')">
+                <h3 style="margin: 0 0 10px 0; font-size: 18px; font-weight: bold;">${design.title}</h3>
+                <p style="margin: 0 0 10px 0; opacity: 0.9; font-size: 14px;">${design.subtitle}</p>
+                <small style="opacity: 0.7; font-size: 12px;">${design.note}</small>
             </div>
         `;
-        console.log('Showing fallback ad for slot', slotNumber);
+        
+        // Mark as fallback ad
+        adElement.dataset.fallbackAd = 'true';
+        console.log('Showing fallback ad for slot', slotNumber, 'with design:', design.title);
+    }
+
+    setupFallbackDetection() {
+        // Set up global error handlers for AdSense
+        window.addEventListener('error', (e) => {
+            if (e.target && e.target.src && e.target.src.includes('googlesyndication')) {
+                console.log('AdSense script failed to load, showing fallbacks');
+                if (this.config.showFallbackAds) {
+                    setTimeout(() => this.showAllFallbackAds(), 500);
+                }
+            }
+        });
+        
+        // Check for AdSense availability after page load
+        setTimeout(() => {
+            if (!window.adsbygoogle) {
+                console.log('AdSense not available after timeout, showing fallbacks');
+                this.showAllFallbackAds();
+            } else {
+                // Even if AdSense is available, check if ads actually loaded
+                console.log('AdSense available, checking if ads loaded...');
+                setTimeout(() => this.checkAndShowFallbacks(), 1000);
+            }
+        }, 1000);
+        
+        // Additional aggressive fallback check
+        setTimeout(() => {
+            console.log('Aggressive fallback check - ensuring ads are visible');
+            this.checkAndShowFallbacks();
+        }, 3000);
+    }
+
+    scheduleAdCheck(adElement, slotNumber) {
+        // Multiple checks at different intervals - more aggressive timing
+        const checkTimes = [1000, 2500, 4000];
+        
+        checkTimes.forEach(delay => {
+            setTimeout(() => {
+                if (!this.isAdLoaded(adElement) && !adElement.dataset.fallbackAd) {
+                    console.log(`Ad slot ${slotNumber} still empty after ${delay}ms, showing fallback`);
+                    this.showFallbackAd(adElement, slotNumber);
+                }
+            }, delay);
+        });
+    }
+
+    isAdLoaded(adElement) {
+        // Check if ad has loaded content
+        const hasContent = adElement.innerHTML.trim() !== '';
+        const hasIframe = adElement.querySelector('iframe') !== null;
+        const hasGoogleAd = adElement.querySelector('[id*="google_ads"]') !== null;
+        const isMarkedFilled = adElement.dataset.adsbygoogleStatus === 'done';
+        const isFallbackAd = adElement.dataset.fallbackAd === 'true';
+        
+        // If it's already a fallback ad, consider it "loaded"
+        if (isFallbackAd) {
+            return true;
+        }
+        
+        // For real AdSense ads, check if they have actual ad content
+        const hasRealAdContent = hasIframe || hasGoogleAd || (hasContent && !isFallbackAd);
+        
+        console.log(`Ad check - hasContent: ${hasContent}, hasIframe: ${hasIframe}, hasGoogleAd: ${hasGoogleAd}, isFallback: ${isFallbackAd}, realContent: ${hasRealAdContent}`);
+        
+        return hasRealAdContent;
+    }
+
+    checkAndShowFallbacks() {
+        const ads = document.querySelectorAll('.adsbygoogle');
+        console.log('Checking if ads loaded...');
+        ads.forEach((ad, index) => {
+            if (!this.isAdLoaded(ad) && !ad.dataset.fallbackAd) {
+                console.log(`Ad slot ${index + 1} didn't load, showing fallback`);
+                this.showFallbackAd(ad, index + 1);
+            }
+        });
     }
 
     showAllFallbackAds() {
         const ads = document.querySelectorAll('.adsbygoogle');
+        console.log(`Showing fallback ads for ${ads.length} ad slots`);
         ads.forEach((ad, index) => {
-            this.showFallbackAd(ad, index + 1);
+            if (!ad.dataset.fallbackAd) {
+                this.showFallbackAd(ad, index + 1);
+            }
         });
     }
 
@@ -200,9 +341,9 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Creating AdSenseManager...');
         window.adsenseManager = new AdSenseManager(window.adsenseConfig);
         
-        // Test in development
-        if (window.adsenseConfig.environment === 'development') {
-            console.log('Running ad tests...');
+        // Test fallback system
+        if (window.adsenseConfig.showFallbackAds) {
+            console.log('Fallback ads enabled, running tests...');
             window.adsenseManager.testAds();
         }
     } else {
@@ -217,7 +358,7 @@ if (document.readyState === 'loading') {
     console.log('Document already loaded, initializing immediately...');
     if (window.adsenseConfig) {
         window.adsenseManager = new AdSenseManager(window.adsenseConfig);
-        if (window.adsenseConfig.environment === 'development') {
+        if (window.adsenseConfig.showFallbackAds) {
             window.adsenseManager.testAds();
         }
     }

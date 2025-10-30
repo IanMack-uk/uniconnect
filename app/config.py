@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     
     # AdSense Testing & Fallbacks
     adsense_test_mode: bool = False  # Set to True to use test ads
-    show_fallback_ads: bool = False  # Set to True to show development placeholders
+    show_fallback_ads: bool = True  # Set to True to show development placeholders
     
     # Production validation
     def is_production_ready(self) -> bool:

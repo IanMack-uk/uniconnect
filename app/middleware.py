@@ -4,17 +4,33 @@ from starlette.responses import Response
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         resp: Response = await call_next(request)
-        # Allow Google AdSense domains + self
+        # Allow Google AdSense domains & inline styles required by Google
         csp = (
             "default-src 'self'; "
-            "script-src 'self' https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.googletagservices.com 'unsafe-inline'; "
-            "img-src 'self' https: data:; "
+            "script-src 'self' 'unsafe-inline' "
+                "https://pagead2.googlesyndication.com "
+                "https://googleads.g.doubleclick.net "
+                "https://www.googletagservices.com "
+                "https://fundingchoicesmessages.google.com; "
             "style-src 'self' 'unsafe-inline'; "
-            "connect-src 'self' https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://ep1.adtrafficquality.google; "
-            "frame-src https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://www.googletagservices.com; "
+            "img-src 'self' data: "
+                "https://pagead2.googlesyndication.com "
+                "https://tpc.googlesyndication.com "
+                "https://googleads.g.doubleclick.net; "
+            "connect-src 'self' "
+                "https://pagead2.googlesyndication.com "
+                "https://googleads.g.doubleclick.net "
+                "https://fundingchoicesmessages.google.com; "
+            "frame-src "
+                "https://googleads.g.doubleclick.net "
+                "https://tpc.googlesyndication.com "
+                "https://www.google.com "
+                "https://google.com "
+                "https://fundingchoicesmessages.google.com; "
             "frame-ancestors 'none'; "
             "base-uri 'self'; "
-            "form-action 'self'"
+            "form-action 'self'; "
+            "upgrade-insecure-requests"
         )
         resp.headers["Content-Security-Policy"] = csp
         resp.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"

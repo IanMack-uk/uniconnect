@@ -5,35 +5,84 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>{{ request.app.title }}</title>
   <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
-  <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ adsense_publisher_id }}"
-          crossorigin="anonymous"></script>
+  
+  <!-- BEGIN: AdSense + NPA default -->
+  <script>
+    // Default to Non-Personalised Ads until user consents
+    window.requestNonPersonalizedAds = 1;
+  </script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9219208012298253" crossorigin="anonymous"></script>
+  <!-- END: AdSense -->
   
   <!-- AdSense Manager -->
   <script src="{{ url_for('static', path='/adsense-manager.js') }}"></script>
   <script>
     // Configuration passed from server
     window.adsenseConfig = {
-      publisherId: '{{ adsense_publisher_id }}',
+      publisherId: 'ca-pub-9219208012298253',
       testMode: {{ adsense_test_mode|lower }},
       environment: '{{ environment }}',
-      cookieConsentEnabled: {{ cookie_consent_enabled|lower }},
+      cookieConsentEnabled: true,
       showFallbackAds: {{ show_fallback_ads|lower }},
       productionReady: {{ production_ready|lower }}
+    };
+    
+    // Debug function available on all pages
+    window.debugAds = function() {
+      console.log('=== AD DEBUG INFO ===');
+      console.log('Config:', window.adsenseConfig);
+      console.log('Manager exists:', !!window.adsenseManager);
+      console.log('AdSense script loaded:', !!window.adsbygoogle);
+      console.log('NPA setting:', window.requestNonPersonalizedAds);
+      
+      const ads = document.querySelectorAll('.adsbygoogle');
+      console.log('Ad slots found:', ads.length);
+      
+      ads.forEach((ad, i) => {
+        console.log(`Ad ${i+1}:`, {
+          element: ad,
+          hasContent: ad.innerHTML.trim() !== '',
+          isFallback: !!ad.dataset.fallbackAd,
+          client: ad.dataset.adClient,
+          slot: ad.dataset.adSlot
+        });
+      });
+      
+      if (window.adsenseManager) {
+        console.log('Forcing fallback ads...');
+        window.adsenseManager.showAllFallbackAds();
+      }
     };
   </script>
 </head>
 <body>
-  <div id="cookie-banner" class="cookie-banner" style="display: none;">
-    <div class="cookie-content">
-      <p>This site uses cookies for ads and analytics to fund UNI Music Scholarships.</p>
-      <div class="cookie-buttons">
-        <button id="cookie-accept" class="cookie-btn cookie-accept">Accept All</button>
-        <button id="cookie-reject" class="cookie-btn cookie-reject">Reject</button>
-        <a href="{{ url_for('privacy') }}" class="cookie-link">Privacy Policy</a>
-      </div>
-    </div>
+  <!-- Minimal cookie banner -->
+  <div id="cookie-banner" style="display:none; position:sticky; bottom:0; background:#111; color:#fff; padding:10px; z-index:9999;">
+    We use Google AdSense to fund UNI Music Scholarships. Allow personalised ads cookies?
+    <button id="cookie-accept">Allow</button>
+    <button id="cookie-reject">No, thanks</button>
+    <a href="{{ url_for('privacy') }}" style="color:#ffd166;">Learn more</a>
   </div>
+  <script>
+  (function () {
+    const key = 'uni_cookie_ads';
+    const banner = document.getElementById('cookie-banner');
+    const choice = localStorage.getItem(key);
+    if (!choice) banner.style.display = 'block';
+    document.getElementById('cookie-accept').onclick = function(){
+      localStorage.setItem(key,'accept');
+      window.requestNonPersonalizedAds = 0;
+      banner.style.display='none';
+      // Re-init ads after consent
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    };
+    document.getElementById('cookie-reject').onclick = function(){
+      localStorage.setItem(key,'reject');
+      window.requestNonPersonalizedAds = 1;
+      banner.style.display='none';
+    };
+  })();
+  </script>
   
   <div class="ribbon">
     This app funds UNI Music Scholarships via ads.

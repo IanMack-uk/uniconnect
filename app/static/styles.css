@@ -21,3 +21,17 @@
 .impact{background:#f5f9ff;border:1px solid #dbe7ff;padding:10px;border-radius:10px;margin-top:8px}
 a{color:#005bbb;text-decoration:none} a:hover{text-decoration:underline}
 @media (max-width:840px){ .grid{grid-template-columns:1fr} }
+
+/* Ensure ad / fallback areas are visible and styled */
+ins.adsbygoogle { 
+  min-height: 120px; 
+  width: 100%; 
+}
+.uni-fallback-ad { 
+  display: grid; 
+  place-items: center; 
+  min-height: 120px; 
+  border: 1px dashed #ddd; 
+  border-radius: 12px; 
+  background: #fafafa; 
+}

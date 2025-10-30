@@ -20,7 +20,9 @@
             publisherId: '{{ adsense_publisher_id }}',
             testMode: {{ adsense_test_mode|lower }},
             environment: '{{ environment }}',
-            cookieConsentEnabled: {{ cookie_consent_enabled|lower }}
+            cookieConsentEnabled: {{ cookie_consent_enabled|lower }},
+            showFallbackAds: true,
+            productionReady: false
         };
         console.log('Test page config:', window.adsenseConfig);
     </script>
@@ -45,6 +47,14 @@
     <button onclick="window.adsenseManager && window.adsenseManager.testAds()">
         🔍 Run Debug Test
     </button>
+    
+    <button onclick="location.reload()">
+        🔄 Reload Page
+    </button>
+    
+    <button onclick="console.clear()">
+        🧹 Clear Console
+    </button>
 
     <div class="ad-container">
         <h3>Test Ad Slot:</h3>
@@ -55,7 +65,6 @@
              data-ad-format="auto"
              data-full-width-responsive="true"
              {% if adsense_test_mode %}data-adtest="on"{% endif %}></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
     </div>
 
     <div class="debug">
