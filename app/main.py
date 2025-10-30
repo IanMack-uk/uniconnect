@@ -61,6 +61,11 @@ def privacy(request: Request):
 def ads_txt():
     return FileResponse("ads.txt", media_type="text/plain")
 
+@app.get("/health")
+def health_check():
+    """Simple health check endpoint"""
+    return {"status": "healthy", "service": "UNI Connect"}
+
 @app.get("/adsense-status")
 def adsense_status():
     """Development endpoint to check AdSense configuration"""
