@@ -1,14 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Mentors</h2>
+<h2>Our Mentor Network</h2>
+<p>Connect with accomplished UNI Music alumni who are making their mark across the music industry. Our mentors volunteer their time to help current students navigate their career paths and achieve their professional goals.</p>
+
 <ul class="cards">
   {% for m in mentors %}
   <li class="card">
     <strong>{{ m.name }}</strong><br/>
-    <span>{{ m.role }}</span>
+    <span style="color: #005bbb; font-weight: bold;">{{ m.role }}</span><br/>
+    <small style="color: #666;">{{ m.graduation }}</small><br/>
+    <strong style="font-size: 14px; color: #333;">Expertise:</strong> {{ m.expertise }}<br/>
+    <p style="margin-top: 8px; font-size: 14px; line-height: 1.4;">{{ m.bio }}</p>
   </li>
   {% endfor %}
 </ul>
+
+<div style="margin-top: 24px; padding: 16px; background: #f5f9ff; border: 1px solid #dbe7ff; border-radius: 12px;">
+  <h3>🤝 How Mentorship Works</h3>
+  <p>Our mentors provide guidance through one-on-one sessions, industry insights, portfolio reviews, and networking opportunities. Whether you're interested in performance, education, production, or music business, our diverse network of professionals is here to support your journey.</p>
+  <p><strong>Ready to connect?</strong> Contact the UNI Music Department to get matched with a mentor in your area of interest.</p>
+</div>
 
 <div class="ad inline">
   <ins class="adsbygoogle"

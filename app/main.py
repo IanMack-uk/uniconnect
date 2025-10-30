@@ -30,9 +30,48 @@ def home(request: Request):
 @app.get("/mentors")
 def mentors(request: Request):
     demo_mentors = [
-        {"name": "Alex R.", "role": "Mix Engineer @ Studio One"},
-        {"name": "Sam T.", "role": "Composer for TV"},
-        {"name": "Jamie L.", "role": "Live Sound Tech @ VenueX"},
+        {
+            "name": "Alexandra Rodriguez", 
+            "role": "Senior Mix Engineer @ Abbey Road Studios",
+            "graduation": "UNI Music Technology '15",
+            "expertise": "Audio Production, Mixing, Mastering",
+            "bio": "Grammy-nominated engineer who has worked with major artists including Taylor Swift and Ed Sheeran. Passionate about mentoring the next generation of audio professionals."
+        },
+        {
+            "name": "Samuel Thompson", 
+            "role": "Composer & Music Director",
+            "graduation": "UNI Music Composition '12", 
+            "expertise": "Film Scoring, TV Music, Orchestration",
+            "bio": "Emmy-winning composer for Netflix originals and HBO series. Specializes in helping students transition from academic composition to professional media scoring."
+        },
+        {
+            "name": "Jamie Liu", 
+            "role": "Live Sound Engineer & Tour Manager",
+            "graduation": "UNI Music Business '18",
+            "expertise": "Live Sound, Tour Production, Artist Management", 
+            "bio": "Currently touring with major acts including Billie Eilish and The Weeknd. Offers insights into the live music industry and career development strategies."
+        },
+        {
+            "name": "Dr. Maria Santos", 
+            "role": "Music Education Director",
+            "graduation": "UNI Music Education '08",
+            "expertise": "K-12 Music Education, Curriculum Development",
+            "bio": "Award-winning music educator who built one of Iowa's top high school music programs. Mentors students interested in music education careers."
+        },
+        {
+            "name": "David Chen", 
+            "role": "Music Business Executive",
+            "graduation": "UNI Music Business '10",
+            "expertise": "Artist Development, Music Marketing, Digital Strategy",
+            "bio": "VP of A&R at Universal Music Group. Helps students understand the modern music industry landscape and develop business acumen."
+        },
+        {
+            "name": "Rebecca Johnson", 
+            "role": "Professional Violinist & Educator", 
+            "graduation": "UNI Performance '14",
+            "expertise": "Classical Performance, Chamber Music, Private Teaching",
+            "bio": "Principal violinist with the Chicago Symphony Orchestra. Mentors performance majors on audition preparation and professional development."
+        }
     ]
     return templates.TemplateResponse(
         request,
@@ -49,13 +88,13 @@ def mentors(request: Request):
         },
     )
 
+@app.get("/about")
+def about(request: Request):
+    return templates.TemplateResponse(request, "about.html")
+
 @app.get("/privacy")
 def privacy(request: Request):
-    return templates.TemplateResponse(
-        request,
-        "privacy.html",
-        {},
-    )
+    return templates.TemplateResponse(request, "privacy.html")
 
 @app.get("/ads.txt")
 def ads_txt():
