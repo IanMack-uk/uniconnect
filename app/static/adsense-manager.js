@@ -90,9 +90,14 @@ class AdSenseManager {
             
             ads.forEach((ad, index) => {
                 console.log(`Processing ad slot ${index + 1}:`, ad);
-                if (!ad.dataset.adsbygoogleStatus) {
+                // Check if already processed by AdSense or our fallback system
+                if (!ad.dataset.adsbygoogleStatus && !ad.dataset.fallbackAd && !ad.dataset.adsenseProcessed) {
                     try {
                         console.log('Loading ad slot', index + 1, 'with client:', ad.dataset.adClient);
+                        
+                        // Mark as being processed to prevent duplicate calls
+                        ad.dataset.adsenseProcessed = 'true';
+                        
                         (adsbygoogle = window.adsbygoogle || []).push({});
                         
                         // Add fallback detection for all environments if enabled
@@ -108,7 +113,7 @@ class AdSenseManager {
                         }
                     }
                 } else {
-                    console.log(`Ad slot ${index + 1} already processed`);
+                    console.log(`Ad slot ${index + 1} already processed or has fallback`);
                 }
             });
         } else {
@@ -260,7 +265,7 @@ class AdSenseManager {
         const ads = document.querySelectorAll('.adsbygoogle');
         console.log(`Showing fallback ads for ${ads.length} ad slots`);
         ads.forEach((ad, index) => {
-            if (!ad.dataset.fallbackAd) {
+            if (!ad.dataset.fallbackAd && !ad.dataset.adsenseProcessed) {
                 this.showFallbackAd(ad, index + 1);
             }
         });

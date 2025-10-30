@@ -73,8 +73,11 @@
       localStorage.setItem(key,'accept');
       window.requestNonPersonalizedAds = 0;
       banner.style.display='none';
-      // Re-init ads after consent
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
+      // Notify AdSense manager of consent change instead of re-initializing
+      console.log('User accepted cookies - switched to personalized ads');
+      if (window.adsenseManager) {
+        window.adsenseManager.cookieConsentGiven = true;
+      }
     };
     document.getElementById('cookie-reject').onclick = function(){
       localStorage.setItem(key,'reject');
