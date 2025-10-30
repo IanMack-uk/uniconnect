@@ -5,12 +5,16 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>{{ request.app.title }}</title>
   <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+  <!-- Fallback direct link -->
+  <link rel="stylesheet" href="/static/styles.css">
   <!-- Google AdSense -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ adsense_publisher_id }}"
           crossorigin="anonymous"></script>
   
   <!-- AdSense Manager -->
   <script src="{{ url_for('static', path='adsense-manager.js') }}"></script>
+  <!-- Fallback direct link -->
+  <script src="/static/adsense-manager.js"></script>
   <script>
     // Configuration passed from server
     window.adsenseConfig = {

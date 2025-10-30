@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -8,8 +9,21 @@ from app.middleware import SecurityHeadersMiddleware
 app = FastAPI(title="UNI Connect (Demo)")
 app.add_middleware(SecurityHeadersMiddleware)
 
+# Mount static files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
+
+# Debug endpoint to check static files
+@app.get("/debug")
+def debug_info():
+    import os
+    return {
+        "cwd": os.getcwd(),
+        "static_exists": os.path.exists("app/static"),
+        "css_exists": os.path.exists("app/static/styles.css"),
+        "js_exists": os.path.exists("app/static/adsense-manager.js"),
+        "static_files": os.listdir("app/static") if os.path.exists("app/static") else []
+    }
 
 @app.get("/")
 def home(request: Request):
