@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Our Mentor Network</h2>
-<p>Connect with accomplished UNI Music alumni who are making their mark across the music industry. Our mentors volunteer their time to help current students navigate their career paths and achieve their professional goals.</p>
+<h2>Demo Mentor Network</h2>
+<p><strong>🧪 Demo Content:</strong> This page showcases how a music mentorship platform could present professional mentors. All profiles are fictional and created for demonstration purposes to illustrate the platform concept.</p>
 
 <ul class="cards">
   {% for m in mentors %}
@@ -16,9 +16,9 @@
 </ul>
 
 <div style="margin-top: 24px; padding: 16px; background: #f5f9ff; border: 1px solid #dbe7ff; border-radius: 12px;">
-  <h3>🤝 How Mentorship Works</h3>
-  <p>Our mentors provide guidance through one-on-one sessions, industry insights, portfolio reviews, and networking opportunities. Whether you're interested in performance, education, production, or music business, our diverse network of professionals is here to support your journey.</p>
-  <p><strong>Ready to connect?</strong> Contact the UNI Music Department to get matched with a mentor in your area of interest.</p>
+  <h3>🤝 Demo Platform Concept</h3>
+  <p>This demonstration shows how mentorship platforms could facilitate connections between students and industry professionals through one-on-one sessions, industry insights, portfolio reviews, and networking opportunities.</p>
+  <p><strong>Demo Purpose:</strong> This page illustrates how educational platforms can present mentor networks while integrating sustainable ad-supported funding models.</p>
 </div>
 
 <div class="ad inline">
@@ -29,6 +29,6 @@
        data-ad-format="auto"
        data-full-width-responsive="true"
        {% if request.headers.get('host','').startswith('localhost') %}data-adtest="on"{% endif %}></ins>
-  <small class="ad-note">This ad helps fund UNI Music Scholarships.</small>
+  <small class="ad-note">Demo: AdSense integration for educational platforms.</small>
 </div>
 {% endblock %}

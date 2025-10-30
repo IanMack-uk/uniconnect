@@ -2,22 +2,33 @@
 {% block content %}
 <section class="grid">
   <div>
-    <h2>Welcome to UNI Connect — Music</h2>
-    <p>The University of Northern Iowa's premier platform connecting current music students with accomplished alumni mentors. Our mission is to foster meaningful relationships that advance careers while funding music education through our innovative scholarship program.</p>
+    <h2>Welcome to Music Connect — Demo Platform</h2>
+    <p><strong>🚀 This is a demonstration website</strong> showcasing how educational platforms can effectively integrate Google AdSense to support their mission. This demo illustrates a music mentorship platform concept that connects students with industry professionals.</p>
     
-    <h3>🎵 What We Offer</h3>
+    <div style="padding: 16px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; margin: 16px 0;">
+      <strong>📋 Demo Site Notice:</strong> This is a trial website created to demonstrate and explore how Google AdSense can work in practice for educational platforms. All content is for demonstration purposes only.
+    </div>
+    
+    <h3>🎵 Platform Concept</h3>
+    <p>This demo showcases a music education platform that would:</p>
     <ul>
-      <li><strong>Professional Mentorship</strong> - Connect with industry professionals in performance, education, production, and music business</li>
-      <li><strong>Career Guidance</strong> - Get insights into music industry pathways from those who've walked them</li>
-      <li><strong>Networking Opportunities</strong> - Build lasting connections within the UNI Music community</li>
-      <li><strong>Scholarship Support</strong> - Every interaction helps fund the next generation of musicians</li>
+      <li><strong>Connect Students & Mentors</strong> - Link aspiring musicians with industry professionals</li>
+      <li><strong>Provide Career Guidance</strong> - Offer insights into music industry career paths</li>
+      <li><strong>Build Networks</strong> - Create lasting professional relationships in music</li>
+      <li><strong>Support Education</strong> - Use ad revenue to fund music education initiatives</li>
     </ul>
     
-    <h3>🎓 Our Impact</h3>
-    <p>Since launching, UNI Connect has facilitated over 500 mentor-student connections, leading to internships, job placements, and collaborative projects. Our unique ad-supported model has generated funding for 25+ music scholarships, directly supporting students who might otherwise struggle to afford their music education.</p>
+    <h3>💡 AdSense Integration Demo</h3>
+    <p>This demonstration site explores how educational platforms can:</p>
+    <ul>
+      <li>Implement <strong>ethical advertising</strong> that aligns with educational missions</li>
+      <li>Use <strong>GDPR-compliant consent systems</strong> for personalized vs non-personalized ads</li>
+      <li>Display <strong>fallback content</strong> when ads don't load</li>
+      <li>Generate <strong>sustainable funding</strong> for educational programs</li>
+    </ul>
     
     <div class="impact">
-      <strong>Scholarship Impact:</strong> Every page view helps fund UNI Music Scholarships. Together, we're building a sustainable future for music education at UNI.
+      <strong>Demo Purpose:</strong> This site demonstrates how ad-supported educational platforms can create sustainable funding models while maintaining user experience and privacy compliance.
     </div>
   </div>
 
@@ -31,7 +42,7 @@
            data-ad-format="auto"
            data-full-width-responsive="true"
            {% if request.headers.get('host','').startswith('localhost') %}data-adtest="on"{% endif %}></ins>
-      <small class="ad-note">This ad helps fund UNI Music Scholarships.</small>
+      <small class="ad-note">Demo: AdSense integration for educational platforms.</small>
     </div>
   </aside>
 </section>
