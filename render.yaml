@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: uni-connect
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    healthCheckPath: "/adsense-status"
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: ADSENSE_PUBLISHER_ID
+        value: ca-pub-9219208012298253
+      - key: ADSENSE_TEST_MODE
+        value: false
+      - key: SHOW_FALLBACK_ADS
+        value: false

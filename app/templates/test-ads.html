@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdSense Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .ad-container { border: 2px dashed #ccc; padding: 20px; margin: 20px 0; }
+        .debug { background: #f0f0f0; padding: 10px; margin: 10px 0; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ adsense_publisher_id }}"
+            crossorigin="anonymous"></script>
+    <!-- AdSense Manager -->
+    <script src="{{ url_for('static', path='/adsense-manager.js') }}"></script>
+    <script>
+        window.adsenseConfig = {
+            publisherId: '{{ adsense_publisher_id }}',
+            testMode: {{ adsense_test_mode|lower }},
+            environment: '{{ environment }}',
+            cookieConsentEnabled: {{ cookie_consent_enabled|lower }}
+        };
+        console.log('Test page config:', window.adsenseConfig);
+    </script>
+</head>
+<body>
+    <h1>🧪 AdSense Test Page</h1>
+    
+    <div class="debug">
+        <h3>Configuration:</h3>
+        <ul>
+            <li>Publisher ID: {{ adsense_publisher_id }}</li>
+            <li>Slot ID: {{ adsense_slot_id }}</li>
+            <li>Test Mode: {{ adsense_test_mode }}</li>
+            <li>Environment: {{ environment }}</li>
+        </ul>
+    </div>
+
+    <button onclick="window.adsenseManager && window.adsenseManager.showAllFallbackAds()">
+        🎯 Force Show Fallback Ads
+    </button>
+    
+    <button onclick="window.adsenseManager && window.adsenseManager.testAds()">
+        🔍 Run Debug Test
+    </button>
+
+    <div class="ad-container">
+        <h3>Test Ad Slot:</h3>
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="{{ adsense_publisher_id }}"
+             data-ad-slot="{{ adsense_slot_id }}"
+             data-ad-format="auto"
+             data-full-width-responsive="true"
+             {% if adsense_test_mode %}data-adtest="on"{% endif %}></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+
+    <div class="debug">
+        <h3>Instructions:</h3>
+        <ol>
+            <li>Open browser console (F12)</li>
+            <li>Look for debug messages</li>
+            <li>Click "Force Show Fallback Ads" to see demo ads</li>
+            <li>Click "Run Debug Test" for detailed info</li>
+        </ol>
+    </div>
+
+    <script>
+        // Additional debugging
+        window.addEventListener('load', function() {
+            console.log('Page fully loaded');
+            console.log('AdSense script loaded:', !!window.adsbygoogle);
+            console.log('AdSense manager:', !!window.adsenseManager);
+            
+            setTimeout(function() {
+                console.log('Checking ad slots after 3 seconds...');
+                const ads = document.querySelectorAll('.adsbygoogle');
+                console.log('Found', ads.length, 'ad slots');
+                ads.forEach((ad, i) => {
+                    console.log(`Ad ${i+1} content:`, ad.innerHTML.length > 0 ? 'Has content' : 'Empty');
+                });
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

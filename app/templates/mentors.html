@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Mentors</h2>
+<ul class="cards">
+  {% for m in mentors %}
+  <li class="card">
+    <strong>{{ m.name }}</strong><br/>
+    <span>{{ m.role }}</span>
+  </li>
+  {% endfor %}
+</ul>
+
+<div class="ad inline">
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="{{ adsense_publisher_id }}"
+       data-ad-slot="{{ adsense_slot_id }}"
+       data-ad-format="auto"
+       data-full-width-responsive="true"
+       {% if adsense_test_mode %}data-adtest="on"{% endif %}></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  <small class="ad-note">This ad helps fund UNI Music Scholarships.</small>
+</div>
+{% endblock %}
