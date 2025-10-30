@@ -1,22 +1,30 @@
 #!/bin/bash
 
-echo "📦 Pushing UNI Connect to GitHub..."
+echo "📦 Pushing UNI Connect to GitHub as 'unialumniapp'..."
 
-# You'll need to replace this URL with your actual GitHub repo URL
-GITHUB_REPO_URL="https://github.com/yourusername/uni-connect.git"
+# Replace 'yourusername' with your actual GitHub username
+GITHUB_USERNAME="yourusername"
+GITHUB_REPO_URL="https://github.com/$GITHUB_USERNAME/unialumniapp.git"
 
-echo "⚠️  IMPORTANT: Update GITHUB_REPO_URL in this script first!"
+echo "⚠️  IMPORTANT: Update your GitHub username!"
 echo "   Current URL: $GITHUB_REPO_URL"
 echo ""
-read -p "Have you updated the GitHub repo URL? (y/n): " -n 1 -r
-echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-    echo "❌ Please update the GITHUB_REPO_URL variable in this script first"
-    exit 1
+read -p "Enter your GitHub username: " github_user
+GITHUB_REPO_URL="https://github.com/$github_user/unialumniapp.git"
+echo "   Updated URL: $GITHUB_REPO_URL"
+echo ""
+
+# Check if remote already exists
+if git remote get-url origin >/dev/null 2>&1; then
+    echo "🔄 Updating existing remote origin..."
+    git remote set-url origin $GITHUB_REPO_URL
+else
+    echo "➕ Adding remote origin..."
+    git remote add origin $GITHUB_REPO_URL
 fi
 
-# Add remote origin
-git remote add origin $GITHUB_REPO_URL
+# Switch to main branch
+git branch -M main
 
 # Push to GitHub
 echo "🚀 Pushing to GitHub..."
@@ -24,3 +32,4 @@ git push -u origin main
 
 echo "✅ Code pushed to GitHub!"
 echo "📋 Next: Deploy on Railway at https://railway.app/"
+echo "🔗 Repository: $GITHUB_REPO_URL"
