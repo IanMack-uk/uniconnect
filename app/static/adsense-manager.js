@@ -20,15 +20,18 @@ class AdSenseManager {
         // Show fallback ads if enabled (works in all environments now)
         if (this.config.showFallbackAds) {
             console.log('Fallback ads enabled - will show if AdSense fails');
+            console.log('Current hostname:', window.location.hostname);
+            console.log('Production ready:', this.config.productionReady);
+            
             this.setupFallbackDetection();
             
-            // Force show fallbacks after a short delay if we're not in production
+            // IMMEDIATE fallback for development/testing
             if (!this.config.productionReady) {
-                console.log('Not production ready - will force show fallbacks');
+                console.log('Not production ready - will force show fallbacks immediately');
                 setTimeout(() => {
                     console.log('Forcing fallback ads due to non-production environment');
-                    this.showAllFallbackAds();
-                }, 2000);
+                    this.forceAllFallbacks();
+                }, 1000);
             }
             
             // Additional check for production environments (Railway, etc.)
@@ -36,23 +39,45 @@ class AdSenseManager {
                                window.location.hostname.includes('herokuapp.com') ||
                                !window.location.hostname.includes('localhost');
             
+            console.log('Is production environment:', isProduction);
+            
             if (isProduction) {
                 console.log('Production environment detected - enabling aggressive fallback checks');
                 setTimeout(() => {
-                    console.log('Production fallback check at 3s');
-                    this.checkAndShowFallbacks();
-                }, 3000);
-                
-                setTimeout(() => {
-                    console.log('Production fallback check at 5s');
-                    this.checkAndShowFallbacks();
-                }, 5000);
+                    console.log('Production fallback check at 2s');
+                    this.forceAllFallbacks();
+                }, 2000);
             }
         }
         
         if (this.cookieConsentGiven || !this.config.cookieConsentEnabled) {
             this.enableAds();
         }
+        
+        // EMERGENCY FALLBACK - Force show fallbacks after 3 seconds regardless
+        setTimeout(() => {
+            console.log('EMERGENCY FALLBACK CHECK - Forcing fallbacks if no ads visible');
+            const ads = document.querySelectorAll('.adsbygoogle');
+            let hasVisibleAds = false;
+            
+            ads.forEach((ad, index) => {
+                const rect = ad.getBoundingClientRect();
+                const hasHeight = rect.height > 50;
+                const hasContent = ad.innerHTML.trim().length > 100;
+                const isFallback = ad.dataset.fallbackAd === 'true';
+                
+                console.log(`Emergency check - Ad ${index + 1}: height=${rect.height}, hasContent=${hasContent}, isFallback=${isFallback}`);
+                
+                if (hasHeight && (hasContent || isFallback)) {
+                    hasVisibleAds = true;
+                }
+            });
+            
+            if (!hasVisibleAds) {
+                console.log('NO VISIBLE ADS DETECTED - FORCING ALL FALLBACKS');
+                this.forceAllFallbacks();
+            }
+        }, 3000);
     }
 
     setupCookieConsent() {
@@ -298,6 +323,17 @@ class AdSenseManager {
         console.log(`Showing fallback ads for ${ads.length} ad slots`);
         ads.forEach((ad, index) => {
             if (!ad.dataset.fallbackAd && !ad.dataset.adsenseProcessed) {
+                this.showFallbackAd(ad, index + 1);
+            }
+        });
+    }
+    
+    forceAllFallbacks() {
+        const ads = document.querySelectorAll('.adsbygoogle');
+        console.log(`FORCE: Showing fallback ads for ${ads.length} ad slots (ignoring all flags)`);
+        ads.forEach((ad, index) => {
+            if (!ad.dataset.fallbackAd) {
+                console.log(`FORCE: Showing fallback for ad slot ${index + 1}`);
                 this.showFallbackAd(ad, index + 1);
             }
         });
